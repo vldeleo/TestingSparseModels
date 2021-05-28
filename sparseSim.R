@@ -10,7 +10,8 @@ library(ggplot2)
 library(clusterGeneration) #a more flexible way to generate covariance matrices
 library(ggpubr) # for plotting in multiple panes
 library(qgraph) # because I'd like cool viz of my correlated predictors
-set.seed(518)
+set.seed(518) #used this for first set
+              # second set (with many effects) I set.seed(527) and then after 30 set.seed(528)
 
 # Simulate Data
   #I think I'll want this to be a function that I can choose options
@@ -154,21 +155,22 @@ return(out)
 ### LOOP CODE ###
 
 AllOutput <- list()
-
-for (i in 2:5) {
-  stepOut <- sparseSim(1000, 800, effect = "few", corr = "yes", Var = 10, model = c("lm", "susie", "blasso", "bhs", "bridge"), M = 15, withPred = TRUE)
-  repname <- paste("rep", i, sep = "_")
+# use set.seed 529 for 61-75
+# set.seed(530) for 76-
+for (i in 76:100) {
+  stepOut <- sparseSim(500, 400, effect = "many", corr = "yes", Var = 10, model = c("lm", "susie", "blasso", "bhs", "bridge"), M = 15, withPred = TRUE)
+  repname <- paste("rep", i, sep = "")
   #AllOutput[[repname]] <- stepOut
-  #write(AllOutput)
   print(repname)
   for (l in 1:length(stepOut)){
-    write.csv(stepOut[l], file = paste("/pfs/tsfs1/gscratch/vdeleo/SparseTests/n1000p800fewcorrvar10m15_2021.5.21/rep", i, "_col", l, ".csv", sep = ""))
+    write.csv(stepOut[l], file = paste(repname, "_", names(stepOut)[l], ".csv", sep = ""))
   }
 }
 save(AllOutput, file = "n1000p800fewcorrvar10m15_2021.5.21.Rdata")
 # this is crazy slow and will never finish in time ):
-    # should probably add a write step within the loop in case I hit a wall limit
-#about 5 min/rep???
+    # added a write step within the loop in case I hit a wall limit
+    # writing reps individually allows me to stay under the default memory limit for my interactive session
+#for n = 1000 and p = 800, this takes about 5 min/rep
   # can do 40 reps in <4 hours, which seems like the best choice for now
 
 

@@ -10,7 +10,9 @@ predR2few$sparse <- "sparse"
 predR2 <- rbind(predR2many, predR2few)
 predR2$X <- as.character(predR2$X) # turns out I can't use an integer as an ID column
 predR2 <- melt(predR2, id = c("X", "sparse"), variable.name = "model")
+png(filename = "predR2comparison_6.2.21.png", width = 600, height = 400)
 ggplot(predR2, aes(x = model, y = value, color = sparse, fill = sparse)) +  geom_boxplot(width=0.5,lwd=1) + ggtitle("R2 of Predicted vs Actual OOS") + theme_bw()
+dev.off()
 
 # how well do different models do at finding Betas
 BetaR2many <- read.csv("many_BetaR2.csv")
@@ -20,8 +22,9 @@ BetaR2few$sparse <- "sparse"
 BetaR2 <- rbind(BetaR2many, BetaR2few)
 BetaR2$X <- as.character(BetaR2$X) # turns out I can't use an integer as an ID column
 BetaR2 <- melt(BetaR2, id = c("X", "sparse"), variable.name = "model")
+png(filename = "BetaR2comparison_6.2.21.png", width = 600, height = 400)
 ggplot(BetaR2, aes(x = model, y = value, color = sparse, fill = sparse)) +  geom_boxplot(width=0.5,lwd=1) + ggtitle("R2 of Model vs Actual Beta") + theme_bw()
-
+dev.off()
 
 
 

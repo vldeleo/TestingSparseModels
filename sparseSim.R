@@ -1,4 +1,6 @@
 # Simulating datasets to compete models on
+#module load swset/2018.05  gcc/7.3.0 py-matplotlib/2.2.2-py36 r/4.0.5-py27
+
 
 # Load Libraries
 library(susieR)
@@ -50,7 +52,7 @@ Sigma <- genPositiveDefMat("onion", rangeVar = c(1,Var), dim=p)$Sigma
   } else {
   print("Invalid option given for correlation.")
   }
-# To be fair, these don't seem like equivalent comparisons. the code for the correlated dataset generates a range 3x that of the non-correlated random matrix.
+# To be fair, these don't seem like equivalent comparisons. the code for the correlated dataset generates a range of response variables 3x that of the non-correlated random matrix.
   
 
 # now, go back to the appropriately sized X
@@ -96,7 +98,7 @@ return(out)
 
 AllOutput <- list()
 #for (obs in c(100, 500, 1000, 5000)){ 
-  # it would be nice to set and forget, but I'd need to write it in a way that puts the output in different folders if I were to do all in a loop
+  # I still need to write this in a way that puts the output in different folders if I were to loop across different numbers of samples or variables
 for (i in 1:500) {
   stepOut <- sparseSim(1000, 800, effect = "few", corr = "yes", Var = 10)
   repname <- paste("rep", i, sep = "")

@@ -105,7 +105,7 @@ if ("ols" %in% model) {
       olsres <- regress(as.matrix(X), as.matrix(y), method = c("lsr"), p = 0) }
   olsTime <- as.numeric(proc.time() - pt1)[3]
   if(exists("Xtest")){olsResid <- c(olsres$b[1] + as.matrix(Xtest) %*% olsres$b[-1]) - ytest} else {
-    olsResid <- mean(olsres$b[1] + as.matrix(X) %*% olsres$b[-1]) - y}
+    olsResid <- c(olsres$b[1] + as.matrix(X) %*% olsres$b[-1]) - y}
   olsRMSE <- sqrt(mean((olsResid)^2))
   olsMAE <- mean(abs(olsResid))
   olsAIC <- AIC(olsres)
@@ -135,7 +135,7 @@ if ("pls" %in% model) {
       plsres <- regress(as.matrix(X), as.matrix(y), method = c("plsr"), p = 0, ncomp.max = 10) }
   plsTime <- as.numeric(proc.time() - pt1)[3]
   if(exists("Xtest")){plsResid <- c(plsres$b[1] + as.matrix(Xtest) %*% plsres$b[-1]) - ytest} else {
-    plsResid <- mean(plsres$b[1] + as.matrix(X) %*% plsres$b[-1]) - y}
+    plsResid <- c(plsres$b[1] + as.matrix(X) %*% plsres$b[-1]) - y}
   plsRMSE <- sqrt(mean((plsResid)^2))
   plsMAE <- mean(abs(plsResid))
   plsAIC <- NA #AIC(plsres)
@@ -164,7 +164,7 @@ if ("pcr" %in% model) {
     pcrres <- regress(as.matrix(X), as.matrix(y), method = c("pcr"), p = 0, ncomp.max = 10) }
     pcrTime <- as.numeric(proc.time() - pt1)[3]
     if(exists("Xtest")){pcrResid <- c(pcrres$b[1] + as.matrix(Xtest) %*% pcrres$b[-1]) - ytest} else {
-      pcrResid <- mean(pcrres$b[1] + as.matrix(X) %*% pcrres$b[-1]) - y}
+      pcrResid <- c(pcrres$b[1] + as.matrix(X) %*% pcrres$b[-1]) - y}
     pcrRMSE <- sqrt(mean((pcrResid)^2))
     pcrMAE <- mean(abs(pcrResid))
     pcrAIC <- NA #AIC(pcrres)
@@ -193,7 +193,7 @@ if ("lar" %in% model) {
     larres <- regress(as.matrix(X), as.matrix(y), method = c("lar"), p = 0) }
     larTime <- as.numeric(proc.time() - pt1)[3]
     if(exists("Xtest")){larResid <- c(larres$b[1] + as.matrix(Xtest) %*% larres$b[-1]) - ytest} else {
-      larResid <- mean(larres$b[1] + as.matrix(X) %*% larres$b[-1]) - y}
+      larResid <- c(larres$b[1] + as.matrix(X) %*% larres$b[-1]) - y}
     larRMSE <- sqrt(mean((larResid)^2))
     larMAE <- mean(abs(larResid))
     larAIC <- NA #AIC(larres)
@@ -222,7 +222,7 @@ if ("lasso" %in% model) {
       lasres <- regress(as.matrix(X), as.matrix(y), method = c("lasso"), p = 0) }
     lasTime <- as.numeric(proc.time() - pt1)[3]
     if(exists("Xtest")){lasResid <- c(lasres$b[1] + as.matrix(Xtest) %*% lasres$b[-1]) - ytest} else {
-      lasResid <- mean(lasres$b[1] + as.matrix(X) %*% lasres$b[-1]) - y}
+      lasResid <- c(lasres$b[1] + as.matrix(X) %*% lasres$b[-1]) - y}
     lasRMSE <- sqrt(mean((lasResid)^2))
     lasMAE <- mean(abs(lasResid))
     lasAIC <- NA #AIC(lasres) I'm going to have to find a method for this
@@ -250,7 +250,7 @@ if ("ridge" %in% model) {
     } else {ridgeres <- regress(as.matrix(X), as.matrix(y), method = c("ridge"), p = 0) }
     ridgeTime <- as.numeric(proc.time() - pt1)[3]
     if(exists("Xtest")){ridgeResid <- c(ridgeres$b[1] + as.matrix(Xtest) %*% ridgeres$b[-1]) - ytest} else {
-      ridgeResid <- mean(ridgeres$b[1] + as.matrix(X) %*% ridgeres$b[-1]) - y}
+      ridgeResid <- c(ridgeres$b[1] + as.matrix(X) %*% ridgeres$b[-1]) - y}
     ridgeRMSE <- sqrt(mean((ridgeResid)^2))
     ridgeMAE <- mean(abs(ridgeResid))
     ridgeAIC <- NA #AIC(ridgeres)
@@ -280,7 +280,7 @@ if ("blasso" %in% model) {
   } else {blassores <- blasso(as.matrix(X), as.matrix(y), RJ=TRUE, M=M, T=25000, verb = 0)}
   blasTime <- as.numeric(proc.time() - pt1)[3]
   if(exists("Xtest")){blasResid <- c(mean(blassores$mu[10001:25000]) + as.matrix(Xtest) %*% colMeans(blassores$beta[10001:25000,])) - ytest} else {
-    blasResid <- mean(blassores$mu[10001:25000]) + as.matrix(X) %*% colMeans(blassores$beta[10001:25000,]) - y}
+    blasResid <- c(mean(blassores$mu[10001:25000]) + as.matrix(X) %*% colMeans(blassores$beta[10001:25000,])) - y}
   #blasResid <- pred(blassores(Xtest, ytest)) - ytest
   blasRMSE <- sqrt(mean((blasResid)^2))
   blasMAE <- mean(abs(blasResid))

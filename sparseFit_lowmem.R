@@ -110,7 +110,7 @@ if ("ols" %in% model) {
   olsMAE <- mean(abs(olsResid))
   olsAIC <- AIC(olsres)
   olsStats <- c(olsTime, olsRMSE, olsMAE, olsAIC)
-  write.csv(olsStats, file = paste("ModelResults/Rep", l, "_olsStats.csv", sep = ""))
+  write.csv(olsStats, file = paste("ModelResults/Rep", l, "_olsModStats.csv", sep = ""))
     # possibility here to compare model coef to /real/ coeff 
   if (withPred==TRUE){
     olspred <- olsres$b[1] + Xval %*% olsres$b[-1]
@@ -140,7 +140,7 @@ if ("pls" %in% model) {
   plsMAE <- mean(abs(plsResid))
   plsAIC <- NA #AIC(plsres)
   plsStats <- c(plsTime, plsRMSE, plsMAE, plsAIC)
-  write.csv(plsStats, file = paste("ModelResults/Rep", l, "_plsStats.csv", sep = ""))
+  write.csv(plsStats, file = paste("ModelResults/Rep", l, "_plsModStats.csv", sep = ""))
   if (withPred==TRUE) {
     plspred <- plsres$b[1] + Xval %*% plsres$b[-1]
     plspredRMSE <- sqrt(mean((summary(lm(plspred~yval))$residuals)^2))
@@ -169,7 +169,7 @@ if ("pcr" %in% model) {
     pcrMAE <- mean(abs(pcrResid))
     pcrAIC <- NA #AIC(pcrres)
     pcrStats <- c(pcrTime, pcrRMSE, pcrMAE, pcrAIC)
-    write.csv(pcrStats, file = paste("ModelResults/Rep", l, "_pcrStats.csv", sep = ""))
+    write.csv(pcrStats, file = paste("ModelResults/Rep", l, "_pcrModStats.csv", sep = ""))
     if (withPred==TRUE) {
       pcrpred <- pcrres$b[1] + Xval %*% pcrres$b[-1]
       pcrpredRMSE <- sqrt(mean((summary(lm(pcrpred~yval))$residuals)^2))
@@ -198,7 +198,7 @@ if ("lar" %in% model) {
     larMAE <- mean(abs(larResid))
     larAIC <- NA #AIC(larres)
     larStats <- c(larTime, larRMSE, larMAE, larAIC)
-    write.csv(larStats, file = paste("ModelResults/Rep", l, "_larStats.csv", sep = ""))
+    write.csv(larStats, file = paste("ModelResults/Rep", l, "_larModStats.csv", sep = ""))
     if (withPred==TRUE) {
       larpred <- larres$b[1] + Xval %*% larres$b[-1]
       larpredRMSE <- sqrt(mean((summary(lm(larpred~yval))$residuals)^2))
@@ -227,9 +227,9 @@ if ("lasso" %in% model) {
     lasMAE <- mean(abs(lasResid))
     lasAIC <- NA #AIC(lasres) I'm going to have to find a method for this
     lasStats <- c(lasTime, lasRMSE, lasMAE, lasAIC)
-    write.csv(lasStats, file = paste("ModelResults/Rep", l, "_lassoStats.csv", sep = ""))
+    write.csv(lasStats, file = paste("ModelResults/Rep", l, "_lassoModStats.csv", sep = ""))
     if (withPred==TRUE) {
-      lassopred <- coef(lassores)[1] + Xval %*% coef(lassores)[-1]
+      lassopred <- lasres$b[1] + Xval %*% lasres$b[-1]
       lassopredRMSE <- sqrt(mean((summary(lm(lassopred~yval))$residuals)^2))
       lassopredR2 <- summary(lm(lassopred~yval))$adj.r.squared
       lassopredcor <- cor.test(lassopred, yval) 
@@ -238,7 +238,7 @@ if ("lasso" %in% model) {
       rm(lassopred, lassopredRMSE, lassopredR2, lassopredcor, lassoPStats)
     }
     if (coeff==TRUE) {
-      write.csv(coef(lassores), file = paste("ModelResults/Rep", l, "_lassoModCoeff.csv", sep = ""))
+      write.csv(coef(lasres), file = paste("ModelResults/Rep", l, "_lassoModCoeff.csv", sep = ""))
     }
     rm(lasres, lasTime, lasRMSE, lasMAE, lasAIC, lasStats)
     gc()
@@ -255,9 +255,9 @@ if ("ridge" %in% model) {
     ridgeMAE <- mean(abs(ridgeResid))
     ridgeAIC <- NA #AIC(ridgeres)
     ridgeStats <- c(ridgeTime, ridgeRMSE, ridgeMAE, ridgeAIC)
-    write.csv(ridgeStats, file = paste("ModelResults/Rep", l, "_ridgeStats.csv", sep = ""))
+    write.csv(ridgeStats, file = paste("ModelResults/Rep", l, "_ridgeModStats.csv", sep = ""))
     if (withPred==TRUE) {
-      ridgepred <- coef(ridgeres)[1] + Xval %*% coef(ridgeres)[-1]
+      ridgepred <- ridgeres$b[1] + Xval %*% ridgeres$b[-1]
       ridgepredRMSE <- sqrt(mean((summary(lm(ridgepred~yval))$residuals)^2))
       ridgepredR2 <- summary(lm(ridgepred~yval))$adj.r.squared
       ridgepredcor <- cor.test(ridgepred, yval) 
@@ -266,7 +266,7 @@ if ("ridge" %in% model) {
       rm(ridgepred, ridgepredRMSE, ridgepredR2, ridgepredcor, ridgePStats)
     }
     if (coeff==TRUE) {
-      write.csv(coef(ridgeres), file = paste("ModelResults/Rep", l, "_ridgeModCoeff.csv", sep = ""))
+      write.csv(coeff(ridgeres), file = paste("ModelResults/Rep", l, "_ridgeModCoeff.csv", sep = ""))
     }
     rm(ridgeres, ridgeTime, ridgeRMSE, ridgeMAE, ridgeAIC, ridgeStats)
     gc()
@@ -286,7 +286,7 @@ if ("blasso" %in% model) {
   blasMAE <- mean(abs(blasResid))
   blasAIC <- NA #AIC(blassores) monomvn doesn't have a default function to do AIC on a blasso object
   blasStats <- c(blasTime, blasRMSE, blasMAE, blasAIC)
-  write.csv(blasStats, file = paste("ModelResults/Rep", l, "_blasStats.csv", sep = ""))
+  write.csv(blasStats, file = paste("ModelResults/Rep", l, "_blasModStats.csv", sep = ""))
   if (withPred==TRUE) {
     blassopred <- mean(blassores$mu[10001:25000]) + Xval %*% colMeans(blassores$beta[10001:25000,])
     blaspredRMSE <- sqrt(mean((resid(lm(blassopred~yval)))^2))
@@ -313,7 +313,7 @@ if ("bhs" %in% model) {
   bhsMAE <- mean(abs(bhsResid))
   bhsAIC <- NA #AIC(bhsres) #need to find another approach here. is BIC good alternative?
   bhsStats <- c(bhsTime, bhsRMSE, bhsMAE, bhsAIC)
-  write.csv(bhsStats, file = paste("ModelResults/Rep", l, "_bhsStats.csv", sep = ""))
+  write.csv(bhsStats, file = paste("ModelResults/Rep", l, "_bhsModStats.csv", sep = ""))
   if (withPred==TRUE) {
     bhspred <- mean(bhsres$mu[10001:25000]) + Xval %*% colMeans(bhsres$beta[10001:25000,]) 
     bhspredRMSE <- sqrt(mean((summary(lm(bhspred~yval))$residuals)^2))
@@ -339,7 +339,7 @@ if ("bridge" %in% model) {
   briMAE <- mean(abs(briResid))
   briAIC <- NA #AIC(brires)
   briStats <- c(briTime, briRMSE, briMAE, briAIC)
-  write.csv(briStats, file = paste("ModelResults/Rep", l, "_briStats.csv", sep = ""))
+  write.csv(briStats, file = paste("ModelResults/Rep", l, "_briModStats.csv", sep = ""))
   if (withPred==TRUE) {
     bridgepred <- mean(bridgeres$mu[10001:25000]) + Xval %*% colMeans(bridgeres$beta[10001:25000,]) 
     bripredRMSE <- sqrt(mean((summary(lm(bridgepred~yval))$residuals)^2))
@@ -366,7 +366,7 @@ if ("susie" %in% model ) {
   susMAE <- mean(abs(susResid))
   susAIC <- NA #AIC(susres) # looks like this one doesn't work either
   susStats <- c(susTime, susRMSE, susMAE, susAIC)
-  write.csv(susStats, file = paste("ModelResults/Rep", l, "_susStats.csv", sep = ""))
+  write.csv(susStats, file = paste("ModelResults/Rep", l, "_susModStats.csv", sep = ""))
   if (withPred==TRUE) {
     suspred <- coef(susres)[1] + Xval %*% coef(susres)[-1]
     suspredRMSE <- sqrt(mean((summary(lm(suspred~yval))$residuals)^2))
@@ -386,9 +386,8 @@ if ("susie" %in% model ) {
 
 #if creating OOS set for testing rather than using existing OOS, save the input
 if (is.null(yOOS) | is.null(XOOS)){
-  input_out <- list(ytest, yval, Xtest, Xval)
-  names(input_out) <- c("ytest", "yval", "Xtest", "Xval")
-  write.csv(input_out, file = paste("ModelResults/Rep", l, "_FitTestInput.csv", sep = "")) 
+  write.csv(c("yval", "Xval"), file = paste("ModelResults/Rep", l, "_FitInput.csv", sep = ""))
+  write.csv(c("ytest", "Xtest"), file = paste("ModelResults/Rep", l, "_TestInput.csv", sep = "")) 
 }
 return("output saved to file")
 }
@@ -433,7 +432,7 @@ for (l in 1:length(resFiles)){
   # fit the models, make predictions, return model diagnostics and coefficients (if requested)
   fitMod(predData, resData, 15, yOOS, XOOS, model = c("lm", "pls", "pcr", "lar", "lasso", "ridge", "blasso", "bridge", "bhs", "susie"), withPred=TRUE, coeff=FALSE) 
   #rm(list=ls()) looking for a way to clean up intermediary files so my process doesn't get killed... this might be too much, though, since it deletes my function
-  gc() #this may not be enough. Still get a segmentation fault with > 1 rep
+  gc() #this may not be enough. 
   print(l)
 }
 

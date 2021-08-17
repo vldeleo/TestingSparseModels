@@ -89,12 +89,12 @@ if ("lm" %in% model) {
     lmpredcor <- cor.test(lmpred, yval)
     lmPStats <- c(lmpredRMSE, lmpredR2, lmpredcor)
     write.csv(lmPStats, file = paste("ModelResults/Rep", l, "_lmPredStats.csv", sep = ""))
-    rm(c(lmpred, lmpredRMSE, lmpredR2, lmpredcor, lmPStats))
+    rm(lmpred, lmpredRMSE, lmpredR2, lmpredcor, lmPStats)
   }
   if (coeff==TRUE) {
     write.csv(coef(lmres), file = paste("ModelResults/Rep", l, "_lmModCoeff.csv", sep = ""))
   }
-  rm(c(lmres, lmTime, lmRMSE, lmMAE, lmAIC, lmStats))
+  rm(lmres, lmTime, lmRMSE, lmMAE, lmAIC, lmStats)
   gc()
 }
 if ("ols" %in% model) {
@@ -119,12 +119,12 @@ if ("ols" %in% model) {
     olspredcor <- cor.test(olspred, yval) # are lm() and regress(method = "ols") equivalent? it looks like it
     olsPStats <- c(olspredRMSE, olspredR2, olspredcor)
     write.csv(olsPStats, file = paste("ModelResults/Rep", l, "_olsPredStats.csv", sep = ""))
-    rm(c(olspred, olspredRMSE, olspredR2, olspredcor, olsPStats))
+    rm(olspred, olspredRMSE, olspredR2, olspredcor, olsPStats)
   }
   if (coeff==TRUE){ 
     write.csv(olsres$b, file = paste("ModelResults/Rep", l, "_olsModCoeff.csv", sep = ""))
   }
-  rm(c(olsres, olsTime, olsRMSE, olsMAE, olsAIC, olsStats))
+  rm(olsres, olsTime, olsRMSE, olsMAE, olsAIC, olsStats)
   gc()
 }
 if ("pls" %in% model) {
@@ -148,12 +148,12 @@ if ("pls" %in% model) {
     plspredcor <- cor.test(plspred, yval) 
     plsPStats <- c(plspredRMSE, plspredR2, plspredcor)
     write.csv(plsPStats, file = paste("ModelResults/Rep", l, "_plsPredStats.csv", sep = ""))
-    rm(c(plspred, plspredRMSE, plspredR2, plspredcor, plsPStats))
+    rm(plspred, plspredRMSE, plspredR2, plspredcor, plsPStats)
   }
   if (coeff==TRUE) {
     write.csv(plsres$b, file = paste("ModelResults/Rep", l, "_plsModCoeff.csv", sep = ""))
   }
-  rm(c(plsres, plsTime, plsRMSE, plsMAE, plsAIC, plsStats))
+  rm(plsres, plsTime, plsRMSE, plsMAE, plsAIC, plsStats)
   gc()
 }
 if ("pcr" %in% model) {
@@ -177,12 +177,12 @@ if ("pcr" %in% model) {
       pcrpredcor <- cor.test(pcrpred, yval)
       pcrPStats <- c(pcrpredRMSE, pcrpredR2, pcrpredcor)
       write.csv(pcrPStats, file = paste("ModelResults/Rep", l, "_pcrPredStats.csv", sep = ""))
-      rm(c(pcrpred, pcrpredRMSE, pcrpredR2, pcrpredcor, pcrPStats))
+      rm(pcrpred, pcrpredRMSE, pcrpredR2, pcrpredcor, pcrPStats)
     }
     if (coeff==TRUE) {
       write.csv(pcrres$b, file = paste("ModelResults/Rep", l, "_pcrModCoeff.csv", sep = ""))
     }
-    rm(c(pcrres, pcrTime, pcrRMSE, pcrMAE, pcrAIC, pcrStats))
+    rm(pcrres, pcrTime, pcrRMSE, pcrMAE, pcrAIC, pcrStats)
     gc()
 }
 if ("lar" %in% model) {
@@ -206,12 +206,12 @@ if ("lar" %in% model) {
       larpredcor <- cor.test(larpred, yval) 
       larPStats <- c(larpredRMSE, larpredR2, larpredcor)
       write.csv(larPStats, file = paste("ModelResults/Rep", l, "_larPredStats.csv", sep = ""))
-      rm(c(larpred, larpredRMSE, larpredR2, larpredcor, larPStats))
+      rm(larpred, larpredRMSE, larpredR2, larpredcor, larPStats)
     }
     if (coeff==TRUE) {
       write.csv(larres$b, file = paste("ModelResults/Rep", l, "_larModCoeff.csv", sep = ""))
     }
-    rm(c(larres, larTime, larRMSE, larMAE, larAIC, larStats))
+    rm(larres, larTime, larRMSE, larMAE, larAIC, larStats)
     gc()   
 }
 if ("lasso" %in% model) {
@@ -235,12 +235,12 @@ if ("lasso" %in% model) {
       lassopredcor <- cor.test(lassopred, yval) 
       lassoPStats <- c(lassopredRMSE, lassopredR2, lassopredcor)
       write.csv(lassoPStats, file = paste("ModelResults/Rep", l, "_lassoPredStats.csv", sep = ""))
-      rm(c(lassopred, lassopredRMSE, lassopredR2, lassopredcor, lassoPStats))
+      rm(lassopred, lassopredRMSE, lassopredR2, lassopredcor, lassoPStats)
     }
     if (coeff==TRUE) {
       write.csv(coef(lassores), file = paste("ModelResults/Rep", l, "_lassoModCoeff.csv", sep = ""))
     }
-    rm(c(lasres, lasTime, lasRMSE, lasMAE, lasAIC, lasStats))
+    rm(lasres, lasTime, lasRMSE, lasMAE, lasAIC, lasStats)
     gc()
   }
 if ("ridge" %in% model) {
@@ -263,12 +263,12 @@ if ("ridge" %in% model) {
       ridgepredcor <- cor.test(ridgepred, yval) 
       ridgePStats <- c(ridgepredRMSE, ridgepredR2, ridgepredcor)
       write.csv(ridgePStats, file = paste("ModelResults/Rep", l, "_ridgePredStats.csv", sep = ""))
-      rm(c(ridgepred, ridgepredRMSE, ridgepredR2, ridgepredcor, ridgePStats))
+      rm(ridgepred, ridgepredRMSE, ridgepredR2, ridgepredcor, ridgePStats)
     }
     if (coeff==TRUE) {
       write.csv(coef(ridgeres), file = paste("ModelResults/Rep", l, "_ridgeModCoeff.csv", sep = ""))
     }
-    rm(c(ridgeres, ridgeTime, ridgeRMSE, ridgeMAE, ridgeAIC, ridgeStats))
+    rm(ridgeres, ridgeTime, ridgeRMSE, ridgeMAE, ridgeAIC, ridgeStats)
     gc()
   }
 
@@ -294,12 +294,12 @@ if ("blasso" %in% model) {
     blaspredcor <- cor.test(blassopred, yval) 
     blasPStats <- c(blaspredRMSE, blaspredR2, blaspredcor)
     write.csv(blasPStats, file = paste("ModelResults/Rep", l, "_blasPredStats.csv", sep = ""))
-    rm(c(blassopred, blaspredRMSE, blaspredR2, blaspredcor, blasPStats))
+    rm(blassopred, blaspredRMSE, blaspredR2, blaspredcor, blasPStats)
   }
   if (coeff==TRUE) {
     write.csv(c(mean(blassores$mu[10001:25000]),colMeans(blassores$beta[10001:25000,])), file = paste("ModelResults/Rep", l, "_blasModCoeff.csv", sep = ""))
   }
-  rm(c(blassores, blasTime, blasRMSE, blasMAE, blasAIC, blasStats))
+  rm(blassores, blasTime, blasRMSE, blasMAE, blasAIC, blasStats)
   gc()
 }
 if ("bhs" %in% model) {
@@ -321,12 +321,12 @@ if ("bhs" %in% model) {
     bhspredcor <- cor.test(bhspred, yval) 
     bhsPStats <- c(bhspredRMSE, bhspredR2, bhspredcor)
     write.csv(bhsPStats, file = paste("ModelResults/Rep", l, "_bhsPredStats.csv", sep = ""))
-    rm(c(bhspred, bhspredRMSE, bhspredR2, bhspredcor, bhsPStats))
+    rm(bhspred, bhspredRMSE, bhspredR2, bhspredcor, bhsPStats)
   }
   if (coeff==TRUE) {
     write.csv(c(mean(bhsres$mu[10001:25000]),colMeans(bhsres$beta[10001:25000,])), file = paste("ModelResults/Rep", l, "_bhsModCoeff.csv", sep = ""))
   }
-  rm(c(bhsres, bhsTime, bhsRMSE, bhsMAE, bhsAIC, bhsStats))
+  rm(bhsres, bhsTime, bhsRMSE, bhsMAE, bhsAIC, bhsStats)
   gc()
 }
 if ("bridge" %in% model) {
@@ -347,12 +347,12 @@ if ("bridge" %in% model) {
     bripredcor <- cor.test(bridgepred, yval) 
     briPStats <- c(bripredRMSE, bripredR2, bripredcor)
     write.csv(briPStats, file = paste("ModelResults/Rep", l, "_briPredStats.csv", sep = ""))
-    rm(c(bridgepred, bripredRMSE, bripredR2, bripredcor, briPStats))
+    rm(bridgepred, bripredRMSE, bripredR2, bripredcor, briPStats)
   }
   if (coeff==TRUE) {
     write.csv(c(mean(bridgeres$mu[10001:25000]),colMeans(bridgeres$beta[10001:25000,])), file = paste("ModelResults/Rep", l, "_bridgeModCoeff.csv", sep = ""))
   }
-  rm(c(bridgeres, briTime, briRMSE, briMAE, briAIC, briStats))
+  rm(bridgeres, briTime, briRMSE, briMAE, briAIC, briStats)
   gc()
 }
 if ("susie" %in% model ) {
@@ -374,12 +374,12 @@ if ("susie" %in% model ) {
     suspredcor <- cor.test(suspred, yval) 
     susPStats <- c(suspredRMSE, suspredR2, suspredcor)
     write.csv(susPStats, file = paste("ModelResults/Rep", l, "_susPredStats.csv", sep = ""))
-    rm(c(suspred, suspredRMSE, suspredR2, suspredcor, susPStats))
+    rm(suspred, suspredRMSE, suspredR2, suspredcor, susPStats)
   }
   if (coeff==TRUE) {
     write.csv(coef(susres), file = paste("ModelResults/Rep", l, "_susModCoeff.csv", sep = ""))
   }
-  rm(c(susres, susTime, susRMSE, susMAE, susAIC, susStats))
+  rm(susres, susTime, susRMSE, susMAE, susAIC, susStats)
   gc()
 }
 

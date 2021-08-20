@@ -33,7 +33,7 @@ ui <- fluidPage(
                         min = 5,
                         max = 500,
                         value = 50),
-            radioButtons(inputId = "sparsity", # this might be better as a drop down box 
+            selectInput(inputId = "sparsity", # can also present this as radio buttons 
                          "Sparse Architecture",
                          choices = c("Dense", "0.33", "0.1", "0.02")), #),
         # Choose models   
@@ -55,9 +55,8 @@ ui <- fluidPage(
         # Show a output
 #        mainPanel(
             plotOutput("histPlot"), #plot of the generated distribution
-#            tableOutput("X") # this is a bit much to print to screen///
-           plotOutput("coefPlot"), ### true vs model coef
-            textOutput("testvar")
+#           tableOutput("X") # this is a bit much to print to screen///
+            plotOutput("coefPlot") ### true vs model coef
 #           plotOutput("predPlot") ### true vs model predictions
 #           plotOutput("timePlot") ### model diagnostics
 #        )
@@ -108,7 +107,7 @@ server <- function(input, output) {
     
     
     output$histPlot <- renderPlot({
-        hist(yfull(), col = 'darkgray', border = 'white', main = "Response Values", xlab = "")})
+        hist(yfull(), col = 'darkgray', border = 'white', main = "Response Values", xlab = "")})  # eventually, I think I want to make visualizing actual data optional
   
     
     # Fit models 
@@ -117,32 +116,63 @@ server <- function(input, output) {
     # Plot models
     output$coefPlot <- renderPlot({
       modlist <- mods()
-      if ("ols" %in% modlist){
+#      if ("ols" %in% modlist){ #I should probably have this run whether or not the user wants it...
         pt1 <- proc.time() 
         olsres <- regress(as.matrix(Xfull()), as.matrix(yfull()), method = c("lsr"), p = 0)
         olsTime <- as.numeric(proc.time() - pt1)[3]
-#      olsResid <- c(olsres$b[1] + as.matrix(X) %*% olsres$b[-1]) - y
-#      olsRMSE <- sqrt(mean((olsResid)^2))
-      olsplot <- plot(as.numeric(beta()), as.numeric(olsres$b[-1]), xlab = "True Beta", ylab = "Model Beta", main = "OLS")
-      }
+        olsResid <- c(olsres$b[1] + as.matrix(Xfull()) %*% olsres$b[-1]) - yfull()
+        olsRMSE <- sqrt(mean((olsResid)^2))
+        olsplot <- c(plot(as.numeric(beta()), as.numeric(olsres$b[-1]), xlab = "True Beta", ylab = "Model Beta", main = "OLS"), legend("bottom", legend = paste("Model RMSE = ", signif(olsRMSE, 3), sep = ""), bty = "n"))
+#      }
       if ("pls" %in% modlist){
         pt1 <- proc.time() 
         plsres <- regress(as.matrix(Xfull()), as.matrix(yfull()), method = c("plsr"), p = 0)
         plsTime <- as.numeric(proc.time() - pt1)[3]
-        #      plsResid <- c(plsres$b[1] + as.matrix(X) %*% plsres$b[-1]) - y
-        #      plsRMSE <- sqrt(mean((plsResid)^2))
-        plsplot <- plot(as.numeric(beta()), as.numeric(plsres$b[-1]), xlab = "True Beta", ylab = "Model Beta", main = "PLS")
-        
+        plsResid <- c(plsres$b[1] + as.matrix(Xfull()) %*% plsres$b[-1]) - yfull()
+        plsRMSE <- sqrt(mean((plsResid)^2))
+        plsplot <- c(plot(as.numeric(beta()), as.numeric(plsres$b[-1]), xlab = "True Beta", ylab = "Model Beta", main = "PLS"), legend("bottom", legend = paste("Model RMSE = ", signif(plsRMSE, 3), sep = ""), bty = "n"))
       }
-#      if ("lasso" %in% mods()){
-        
-#      }
-#      if ("ridge" %in% mods()){
-        
-#      }
-      if(exists("olsplot")){olsplot}
-      if(exists("plsplot")){plsplot}
+      if ("lasso" %in% modlist){
+        pt1 <- proc.time() 
+        lasres <- regress(as.matrix(Xfull()), as.matrix(yfull()), method = c("lasso"), p = 0)
+        lasTime <- as.numeric(proc.time() - pt1)[3]
+        lasResid <- c(lasres$b[1] + as.matrix(Xfull()) %*% lasres$b[-1]) - yfull()
+      lasRMSE <- sqrt(mean((lasResid)^2))
+      lassoplot <- c(plot(as.numeric(beta()), as.numeric(lasres$b[-1]), xlab = "True Beta", ylab = "Model Beta", main = "Lasso"),  legend("bottom", legend = paste("Model RMSE = ", signif(lasRMSE, 3), sep = ""), bty = "n"))
+      }
+      if ("ridge" %in% modlist){
+        pt1 <- proc.time() 
+        ridres <- regress(as.matrix(Xfull()), as.matrix(yfull()), method = c("ridge"), p = 0)
+        ridTime <- as.numeric(proc.time() - pt1)[3]
+        ridResid <- c(ridres$b[1] + as.matrix(Xfull()) %*% ridres$b[-1]) - yfull()
+        ridRMSE <- sqrt(mean((ridResid)^2))
+       ridgeplot <- c(plot(as.numeric(beta()), as.numeric(ridres$b[-1]), xlab = "True Beta", ylab = "Model Beta", main = "Ridge"),  legend("bottom", legend = paste("Model RMSE = ", signif(ridRMSE, 3), sep = ""), bty = "n"))
+      }
+      
+#      togPlot <- c(
+        plot(as.numeric(beta()), as.numeric(olsres$b[-1]), xlab = "True Beta", ylab = "Model Beta", col = "white")
+        if(exists("olsres")){
+          points(as.numeric(beta()), as.numeric(olsres$b[-1]), col = "black")
+          # add line
+          }
+        if(exists("plsres")){
+          points(as.numeric(beta()), as.numeric(plsres$b[-1]), col = "red")
+          # add line
+          }
+        if(exists("lasres")){
+          points(as.numeric(beta()), as.numeric(lasres$b[-1]), col = "blue")
+          # add line
+          }
+        if(exists("ridres")){
+          points(as.numeric(beta()), as.numeric(ridres$b[-1]), col = "darkgoldenrod1")
+          # add line
+        }
+#        legend()
     })
+     
+
+      
+    
         
 #    output$effectSize <- renderPlot({
         

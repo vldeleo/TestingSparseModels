@@ -4,6 +4,7 @@
 
 library(shiny)
 library(monomvn)
+library(scales)
 
 
 # Define UI for application that draws a histogram
@@ -31,7 +32,7 @@ ui <- fluidPage(
             sliderInput(inputId = "preds",
                         "Number of Predictors:",
                         min = 5,
-                        max = 500,
+                        max = 500, # app will crash if there are too many predictors
                         value = 50),
             selectInput(inputId = "sparsity", # can also present this as radio buttons 
                          "Sparse Architecture",
@@ -89,6 +90,10 @@ server <- function(input, output) {
       n <- as.numeric(n())
       p <- as.numeric(p())
       beta_temp <- (rgamma(p, 0.02, 0.1) * sample(c(-1, 1), p, replace = T))
+      if (input$sparsity != "Dense"){
+        sparsity <- as.numeric(input$sparsity)
+        beta_temp[sample(c(1:p), round(p*(1-sparsity),0), replace = F)] <- 0 # all but the fraction of predictors that we've decided should be true effects are set to 0
+      }
       return(beta_temp)
     })
     
@@ -96,10 +101,6 @@ server <- function(input, output) {
       n <- as.numeric(n())
       p <- as.numeric(p())
       beta <- as.numeric(beta())
-      if (input$sparsity != "Dense"){
-        sparsity <- as.numeric(input$sparsity)
-        beta[sample(c(1:p), round(p*(1-sparsity),0), replace = F)] <- 0 # all but the fraction of predictors that we've decided should be true effects are set to 0
-      }
       yfull_temp <- Xfull() %*% beta + rnorm(n) 
       y <- yfull_temp[1:n,] # this could be my smaller, "sampled" population, but in this case it's the same size as Xfull
       return(y)
@@ -151,21 +152,23 @@ server <- function(input, output) {
       
 #      togPlot <- c(
         plot(as.numeric(beta()), as.numeric(olsres$b[-1]), xlab = "True Beta", ylab = "Model Beta", col = "white")
+        abline(0, 1, col = "gray", lwd = 3)
+        clip(min(beta()) - .1, max(beta()) + .1, par("usr")[3], par("usr")[4]) # I would like to fix this so that regression lines get clipped but points do not
         if(exists("olsres")){
-          points(as.numeric(beta()), as.numeric(olsres$b[-1]), col = "black")
-          # add line
+          points(as.numeric(beta()), as.numeric(olsres$b[-1]), col = alpha("black", 0.75), lwd = 3)
+          abline(lm(olsres$b[-1] ~ beta()), col = "black")
           }
         if(exists("plsres")){
-          points(as.numeric(beta()), as.numeric(plsres$b[-1]), col = "red")
-          # add line
+          points(as.numeric(beta()), as.numeric(plsres$b[-1]), col = alpha("red", 0.75), lwd = 3)
+          abline(lm(plsres$b[-1] ~ beta()), col = "red")
           }
         if(exists("lasres")){
-          points(as.numeric(beta()), as.numeric(lasres$b[-1]), col = "blue")
-          # add line
+          points(as.numeric(beta()), as.numeric(lasres$b[-1]), col = alpha("blue", 0.75), lwd = 3)
+          abline(lm(lasres$b[-1] ~ beta()), col = "blue")
           }
         if(exists("ridres")){
-          points(as.numeric(beta()), as.numeric(ridres$b[-1]), col = "darkgoldenrod1")
-          # add line
+          points(as.numeric(beta()), as.numeric(ridres$b[-1]), col = alpha("darkgoldenrod1", 0.75), lwd = 3)
+          abline(lm(ridres$b[-1] ~ beta()), col = "darkgoldenrod1")
         }
 #        legend()
     })

@@ -92,7 +92,7 @@ server <- function(input, output) {
     beta <- reactive({
       n <- as.numeric(n())
       p <- as.numeric(p())
-      beta_temp <- (rgamma(p, 0.02, 0.1) * sample(c(-1, 1), p, replace = T))
+      beta_temp <- rnorm(p) #changed from rgamma(p, 0.02, 0.1) * sample(c(1,-1), p)
       if (input$sparsity != "Dense"){
         sparsity <- as.numeric(input$sparsity)
         beta_temp[sample(c(1:p), round(p*(1-sparsity),0), replace = F)] <- 0 # all but the fraction of predictors that we've decided should be true effects are set to 0

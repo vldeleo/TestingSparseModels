@@ -3,7 +3,7 @@
 #module load swset/2018.05  gcc/7.3.0 py-matplotlib/2.2.2-py36 r/4.0.5-py27
 
 # Load Libraries
-library(MASS) # because I don't have rethinking on the teton server
+library(MASS) # because rethinking is not on the teton server
 library(reshape2)
 library(clusterGeneration) #a more flexible way to generate covariance matrices
 
@@ -52,9 +52,9 @@ X <- Xfull[1:n,]
 #simulate effects
   #beta is length of p
 if (effect == "many"){
-  beta <- rgamma(p, 0.3, 0.25) * sample(c(-1, 1), p, replace = T)
+  beta <- rnorm(p)
 } else if (effect == "few") {
-  beta <- rgamma(p, 0.02, 0.1) * sample(c(-1, 1), p, replace = T)
+  beta <- rgamma(p, 0.9) * sample(c(-1, 1), p, replace = T)
 }
   
 
@@ -89,8 +89,7 @@ return(out)
 
 
 
-# I tried to write this in a way that loops through different numbers of samples or variables and puts the output in different folders
-  # however, I am certain that 1000 correlated variables over 5000 observations will crash due to memory limit
+# I wrote this in a way that loops through different numbers of samples or variables and puts the output in different folders
 
 
 set.seed(1251) #
@@ -109,6 +108,5 @@ for (i in 1:100) { # I want 100 replicates of simulated data
 }
 }
 }
-#save(AllOutput, file = "filename.Rdata")
     # added a write step within the loop in case I hit a wall limit
     # writing reps individually also allows me to stay under the default memory limit as long as I don't go crazy with correlated predictors

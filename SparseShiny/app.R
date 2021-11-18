@@ -2,9 +2,18 @@
 # Run the application by clicking the 'Run App' button above.
 # 
 
+# to dos: 
+  # 1. add other methods (bayesian lasso, bayesian ridge)
+  # 2. fix cropping in scatter plots
+  # 3. make scrolly
+  # 4. allow for iterating simulations to get composite score for accuracy and time
+
+
 library(shiny)
 library(monomvn)
 library(scales)
+library(susieR)
+
 
 
 # Define UI for application that draws a histogram
@@ -13,6 +22,7 @@ ui <- fluidPage(
     # Application title
     titlePanel("Competing Sparse Models"),
 
+    mainPanel("Caution: model fitting will break if you choose more predictors than observations."),
     # User Specifications for Sim Data
         # Number of observations
         # Number of Predictors
@@ -43,8 +53,9 @@ ui <- fluidPage(
                           c("Ordinary Least Squares" = "ols",
                             "Partial Least Squares" ="pls",
                             "Lasso" = "lasso", 
-                            "Ridge" = "ridge"
-                            #, "blasso", "bridge", "bhs", "susie"
+                            "Ridge" = "ridge",
+                            # "blasso", "bridge", "bhs", 
+                            "Susie" = "susie"
                             ),
                           selected = c("ols")
               ),
@@ -84,8 +95,6 @@ server <- function(input, output) {
         Xbig <- Xfull()
         Xsmall <- as.data.frame(Xbig)[1:n,]
         return(Xsmall)
-#        Xfull_temp <- as.data.frame(Xfull())
-#        X <- Xfull_temp[1:n,]
 #        X # I'm having trouble evaluating and then setting aside a subset for prediction
       })
     
@@ -133,15 +142,16 @@ server <- function(input, output) {
     
     plsreact <- reactive({
       modlist <- mods()
-      n <- as.numeric(n())
-      Xsamp <- as.data.frame(Xfull())[1:n,]
-      ysamp <- yfull()[1:n]
       if ("pls" %in% modlist){
-      pt1 <- proc.time() 
-      plsres <- regress(as.matrix(Xsamp), as.matrix(ysamp), method = c("plsr"), p = 0)
-      plsres$plsTime <- as.numeric(proc.time() - pt1)[3]
-      plsres$plsResid <- c(plsres$b[1] + as.matrix(Xsamp) %*% plsres$b[-1]) - ysamp
-      plsres$plsRMSE <- signif(sqrt(mean((plsres$plsResid)^2)), 4)
+        n <- as.numeric(n())
+        Xsamp <- as.data.frame(Xfull())[1:n,]
+        ysamp <- yfull()[1:n]
+        
+        pt1 <- proc.time() 
+        plsres <- regress(as.matrix(Xsamp), as.matrix(ysamp), method = c("plsr"), p = 0)
+        plsres$plsTime <- as.numeric(proc.time() - pt1)[3]
+        plsres$plsResid <- c(plsres$b[1] + as.matrix(Xsamp) %*% plsres$b[-1]) - ysamp
+        plsres$plsRMSE <- signif(sqrt(mean((plsres$plsResid)^2)), 4)
       }
       plsres
       })
@@ -176,13 +186,30 @@ server <- function(input, output) {
       ridres
     })
     
+    susreact <- reactive({
+      modlist <- mods()
+      if ("susie" %in% modlist){
+        n <- as.numeric(n())
+        Xsamp <- as.data.frame(Xfull())[1:n,]
+        ysamp <- yfull()[1:n]
+        pt1 <- proc.time() 
+        susres <- susie(as.matrix(Xsamp), as.matrix(ysamp), L = min(15, ncol(Xsamp)))
+        susres$susTime <- as.numeric(proc.time() - pt1)[3]
+        susres$susResid <- c(coef(susres)[1] + as.matrix(Xsamp) %*% coef(susres)[-1]) - ysamp
+        susres$susRMSE <- signif(sqrt(mean((susres$susResid)^2)), 4)
+      }
+      susres
+    })
+    
     # Plot models
     output$coefPlot <- renderPlot({
       modlist <- mods()
-#      if ("ols" %in% modlist){ #I should probably have this run whether or not the user wants it...
+      #if ("ols" %in% modlist){ #I should probably have this run whether or not the user wants it...
+        # this first block, where I make individual plots, was intended to allow for plots to be made independently, not depending on any one model fit
+        # it might be good to delete, but be sure to keep the olsreact() calls so that the next block of the combined plot can access those calculations
       olsres <- olsreact()
       olsplot <- c(plot(as.numeric(beta()), as.numeric(olsres$b[-1]), xlab = "True Beta", ylab = "Model Beta", main = "OLS"), legend("bottom", legend = paste("Model RMSE = ", signif(olsres$olsRMSE, 3), sep = ""), bty = "n"))
-#      }
+      #}
       if ("pls" %in% modlist){
         plsres <- plsreact()
         plsplot <- c(plot(as.numeric(beta()), as.numeric(plsres$b[-1]), xlab = "True Beta", ylab = "Model Beta", main = "PLS"), legend("bottom", legend = paste("Model RMSE = ", signif(plsres$plsRMSE, 3), sep = ""), bty = "n"))
@@ -194,6 +221,10 @@ server <- function(input, output) {
       if ("ridge" %in% modlist){
         ridres <- ridreact()
         ridgeplot <- c(plot(as.numeric(beta()), as.numeric(ridres$b[-1]), xlab = "True Beta", ylab = "Model Beta", main = "Ridge"),  legend("bottom", legend = paste("Model RMSE = ", signif(ridres$ridRMSE, 3), sep = ""), bty = "n"))
+      }
+      if ("susie" %in% modlist){
+      susres <- susreact()
+      susplot <- c(plot(as.numeric(beta()), as.numeric(coef(susres)[-1]), xlab = "True Beta", ylab = "Model Beta", main = "Susie"),  legend("bottom", legend = paste("Model RMSE = ", signif(susres$susRMSE, 3), sep = ""), bty = "n"))
       }
       
 #      togPlot <- c(
@@ -217,7 +248,12 @@ server <- function(input, output) {
           points(as.numeric(beta()), as.numeric(ridres$b[-1]), col = alpha("darkgoldenrod1", 0.75), lwd = 3)
           abline(lm(ridres$b[-1] ~ beta()), col = "darkgoldenrod1")
         }
-        legend("bottomright", bty = "n", legend = c(if(exists("olsres")){paste("OLS RMSE =", olsres$olsRMSE, sep = "")}, if(exists("plsres")){paste("PLS RMSE =", plsres$plsRMSE, sep = "")}, if(exists("lasres")){paste("Lasso RMSE =", lasres$lasRMSE, sep = "")}, if(exists("ridres")){paste("Ridge RMSE =", ridres$ridRMSE, sep = "")}), text.col = c(if(exists("olsres")){"black"}, if(exists("plsres")){"red"}, if(exists("lasres")){"blue"}, if(exists("ridres")){"darkgoldenrod1"}))
+        if(exists("susres")){
+          points(as.numeric(beta()), as.numeric(coef(susres)[-1]), col = alpha("blueviolet", 0.75), lwd = 3)
+          abline(lm(coef(susres)[-1] ~ beta()), col = "blueviolet")
+        }
+        
+        legend("bottomright", bty = "n", legend = c(if(exists("olsres")){paste("OLS RMSE =", olsres$olsRMSE, sep = "")}, if(exists("plsres")){paste("PLS RMSE =", plsres$plsRMSE, sep = "")}, if(exists("lasres")){paste("Lasso RMSE =", lasres$lasRMSE, sep = "")}, if(exists("ridres")){paste("Ridge RMSE =", ridres$ridRMSE, sep = "")}, if(exists("susres")){paste("Susie RMSE =", susres$susRMSE, sep = "")}), text.col = c(if(exists("olsres")){"black"}, if(exists("plsres")){"red"}, if(exists("lasres")){"blue"}, if(exists("ridres")){"darkgoldenrod1"}, if(exists("susres")){"blueviolet"}))
     })
      
 
@@ -261,7 +297,12 @@ server <- function(input, output) {
        points(OOSvals, ridpred, col = alpha("darkgoldenrod1", 0.75), lwd = 3)
        abline(lm(ridpred ~ OOSvals), col = "darkgoldenrod1")
      }
-
+     if("susie" %in% modlist){
+       susres <- susreact()
+       suspred <- coef(susres)[1] + as.matrix(XOOS) %*% coef(susres)[-1]
+       points(OOSvals, suspred, col = alpha("blueviolet", 0.75), lwd = 3)
+       abline(lm(suspred ~ OOSvals), col = "blueviolet")
+     }
 
     
         

@@ -5,7 +5,9 @@ account: vldeleo
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4517696
-bundleId: 5020744
+bundleId: 5091992
 url: https://vldeleo.shinyapps.io/sparseshiny/
-when: 1631298648.80942
-lastSyncTime: 1631298648.80942
+when: 1633058921.45016
+lastSyncTime: 1633058921.45016
+asMultiple: FALSE
+asStatic: FALSE
